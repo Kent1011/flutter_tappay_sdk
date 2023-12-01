@@ -1,0 +1,76 @@
+// copy aar file to host project
+static aarFileCopy(String srcPath,String desPath) {
+    System.out.println("copy aar from <<${srcPath}>> to <<${desPath}>>")
+    try {
+        FileInputStream fis = new FileInputStream(srcPath)
+        FileOutputStream fos = new FileOutputStream(desPath)
+        byte[] data = new byte[1024*8]
+        int len = 0
+        while ((len = fis.read(data))!=-1) {
+            fos.write(data,0,len)
+        }
+        fis.close()
+        fos.close()
+    }catch(Exception e) {
+        e.printStackTrace()
+    }
+}
+
+// 這邊的 kent.chien.flutter_tappay_sdk 要改
+copyAar2Host('kent.chien.flutter_tappay_sdk')
+void copyAar2Host(String pluginGroup) {
+    Project currentProject = null
+    Project appProject = null
+    rootProject.allprojects.each {
+        p->
+            boolean  isApp = p.plugins.hasPlugin("com.android.application")
+            println("<<${p.name}>> isHost ? ${isApp}")
+            if (p.group == pluginGroup) {
+                currentProject = p
+                println("Plugin project name is $currentProject")
+            }
+            if(isApp) {
+                appProject = p
+                println("Host project name is <<${p.name}>>")
+            }
+    }
+    Set<File> aarFiles = new HashSet<File>()
+    if (appProject != null && currentProject != null) {
+        File libs = new File("${currentProject.projectDir}","libs")
+        if(libs.isDirectory()) {
+            libs.listFiles().each {
+                f->
+                    if(f.name.endsWith(".aar")) {
+                        println("The aar file name to be copied is <<${f.name}>>")
+                        aarFiles.add(f)
+                    }
+
+            }
+        }
+        if (!aarFiles.isEmpty()) {
+            File applibs = new File("${appProject.projectDir}${File.separator}libs")
+            if(!applibs.isDirectory()) {
+                applibs.mkdirs()
+            }
+            aarFiles.each {
+                f->
+                    File copyAar = new File("${appProject.projectDir}${File.separator}libs",f.name)
+                    if(!copyAar.exists()) {
+                        copyAar.createNewFile()
+                        aarFileCopy(f.path,copyAar.path)
+                    } else {
+
+                    }
+            }
+            appProject.dependencies {
+                implementation fileTree(dir:"${appProject.projectDir}${File.separator}libs",include:["*.jar","*.aar"])
+            }
+        }
+    }
+}
+
+repositories{
+    flatDir {
+        dirs 'libs'
+    }
+}
