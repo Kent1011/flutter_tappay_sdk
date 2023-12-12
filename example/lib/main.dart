@@ -89,6 +89,26 @@ class _MyAppState extends State<MyApp> {
                   }
                 },
               ),
+
+            if (_isTapPayReady)
+              ListTile(
+                title: const Text('Start Google Pay'),
+                onTap: () async {
+                  try {
+                    final isGooglePayReady = await _tapPaySdk.initGooglePay(
+                        merchantName: 'Flutter Cafe');
+                    log('isGooglePayReady: ${isGooglePayReady?.toJson()}');
+
+                    if (isGooglePayReady?.success == true) {
+                      var payResult =
+                          await _tapPaySdk.requestGooglePay(price: 2);
+                      log('payResult: ${payResult?.toJson()}');
+                    }
+                  } on PlatformException {
+                    log('PlatformException');
+                  }
+                },
+              ),
           ],
         ),
       ),

@@ -1,36 +1,62 @@
 package kent.chien.flutter_tappay_sdk
 
+import android.app.Activity
 import android.content.Context
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import io.flutter.embedding.engine.plugins.activity.ActivityAware
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import kent.chien.flutter_tappay_sdk.models.CreateCardTokenByCardInfoResult
+import kent.chien.flutter_tappay_sdk.models.TapPaySdkCommonResult
 import tech.cherri.tpdirect.api.TPDCard
 import tech.cherri.tpdirect.api.TPDServerType
 import tech.cherri.tpdirect.api.TPDSetup
 
 /** FlutterTapPaySdkPlugin */
-class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
+class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
   private lateinit var channel: MethodChannel
+
   private lateinit var context: Context
+  private lateinit var activity: Activity
+  private lateinit var googlePayHandler: GooglePayHandler
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "flutter_tappay_sdk")
     channel.setMethodCallHandler(this)
     context = flutterPluginBinding.applicationContext
+    googlePayHandler = GooglePayHandler(context)
+  }
+
+  override fun onAttachedToActivity(binding: ActivityPluginBinding) {
+    activity = binding.activity
+    googlePayHandler.setActivity(activity)
+    binding.addActivityResultListener(googlePayHandler)
+  }
+
+  override fun onDetachedFromActivityForConfigChanges() {
+    activity = null!!
+  }
+
+  override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
+    activity = binding.activity
+    googlePayHandler.setActivity(activity)
+    binding.addActivityResultListener(googlePayHandler)
+  }
+
+  override fun onDetachedFromActivity() {
+    activity = null!!
   }
 
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
+
+      // Get TapPay SDK version
       "sdkVersion" -> result.success(TPDSetup.getVersion())
 
-      "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
-
+      // Initialize TapPay SDK
       "initPayment" -> {
         val appId = call.argument<Int?>("appId")
         val appKey = call.argument<String?>("appKey")
@@ -41,6 +67,7 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
         }
       }
 
+      // Validate card
       "isValidCard" -> {
         val carNumber = call.argument<String?>("cardNumber")
         val expiryMonth = call.argument<String?>("mm")
@@ -50,6 +77,7 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
         result.success(validateCard(carNumber, expiryMonth, expiryYear, cvv))
       }
 
+      // Create token (prime) by card information
       "getPrimeByCardInfo" -> {
         val carNumber: String? = call.argument<String?>("cardNumber")
         val expiryMonth: String? = call.argument<String?>("mm")
@@ -57,6 +85,37 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
         val cvv: String? = call.argument<String?>("cvv")
 
         createTokenByCardInfo(carNumber, expiryMonth, expiryYear, cvv, onResult = {
+          result.success(it)
+        })
+      }
+
+      "initGooglePay" -> {
+        val merchantName: String? = call.argument<String?>("merchantName")
+        val cardTypes: List<String>? = call.argument<List<String>?>("cardTypes")
+        val authMethods: List<String>? = call.argument<List<String>?>("authMethods")
+        val isPhoneNumberRequired: Boolean? = call.argument<Boolean?>("isPhoneNumberRequired")
+        val isBillingAddressRequired: Boolean? =
+          call.argument<Boolean?>("isBillingAddressRequired")
+        val isEmailRequired: Boolean? = call.argument<Boolean?>("isEmailRequired")
+
+        initGooglePay(
+          merchantName,
+          cardTypes,
+          authMethods,
+          isPhoneNumberRequired,
+          isBillingAddressRequired,
+          isEmailRequired,
+          onResult = {
+            result.success(it)
+          }
+        )
+      }
+
+      "requestGooglePay" -> {
+        val price: Double? = call.argument<Double?>("price")
+        val currencyCode: String? = call.argument<String?>("currencyCode")
+
+        requestGooglePay(price, currencyCode, onResult = {
           result.success(it)
         })
       }
@@ -77,9 +136,10 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
     onResult: (HashMap<String, Any?>) -> (Unit)
   ) {
     if (appId == null || appKey == null) {
-      val error = HashMap<String, Any?>()
-      error["success"] = false
-      error["message"] = "\"appId\" and \"appKey\" are required."
+      val error = TapPaySdkCommonResult(
+        false,
+        "\"appId\" and \"appKey\" are required."
+      ).toHashMap()
       onResult(error)
       return
     }
@@ -91,9 +151,10 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
     }
 
     TPDSetup.initInstance(context, appId, appKey, serverType)
-    val result = HashMap<String, Any?>()
-    result["success"] = true
-    result["message"] = ""
+    val result = TapPaySdkCommonResult(
+      true,
+      ""
+    ).toHashMap()
 
     onResult(result)
   }
@@ -129,12 +190,12 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
       cvv.isNullOrEmpty()
     ) {
       onResult(
-        generateTokenResult(
+        CreateCardTokenByCardInfoResult(
           false,
           null,
           "Missing required parameters for \"getPrimeByCardInfo\" method.",
           null
-        )
+        ).toHashMap()
       )
       return
     }
@@ -143,28 +204,76 @@ class FlutterTapPaySdkPlugin : FlutterPlugin, MethodCallHandler {
       context, StringBuffer(cardNumber), StringBuffer(expiryMonth),
       StringBuffer(expiryYear), StringBuffer(cvv)
     ).onSuccessCallback { prime, _, _, _ ->
-      onResult(generateTokenResult(true, null, null, prime))
+      onResult(CreateCardTokenByCardInfoResult(true, null, null, prime).toHashMap())
     }.onFailureCallback { status, reportMsg ->
-      onResult(generateTokenResult(false, status, reportMsg, null))
+      onResult(CreateCardTokenByCardInfoResult(false, status, reportMsg, null).toHashMap())
     }
 
     tpdCard.createToken("UNKNOWN")
   }
 
-  /**
-   * Generate token result
-   */
-  private fun generateTokenResult(
-    success: Boolean, status: Int?, message: String?,
-    prime: String?
-  ): HashMap<String, Any?> {
-    val result = HashMap<String, Any?>()
+  private fun initGooglePay(
+    merchantName: String? = null,
+    cardTypes: List<String>? = null,
+    authMethods: List<String>? = null,
+    isPhoneNumberRequired: Boolean? = null,
+    isBillingAddressRequired: Boolean? = null,
+    isEmailRequired: Boolean? = null,
+    onResult: (HashMap<String, Any?>) -> (Unit)
+  ) {
+    val callback = object : GooglePayHandler.Companion.GooglePayCheckCallback {
+      override fun onGooglePayCheck(result: TapPaySdkCommonResult) {
+        onResult(
+          result.toHashMap()
+        )
+      }
+    }
 
-    result["success"] = success
-    result["status"] = status
-    result["message"] = message ?: ""
-    result["prime"] = prime ?: ""
+    googlePayHandler.initGooglePay(
+      merchantName,
+      cardTypes,
+      authMethods,
+      isPhoneNumberRequired,
+      isBillingAddressRequired,
+      isEmailRequired,
+      callback
+    )
+  }
 
-    return result
+  private fun requestGooglePay(
+    price: Double?,
+    currencyCode: String?,
+    onResult: (HashMap<String, Any?>) -> (Unit)
+  ) {
+    if (price == null || currencyCode.isNullOrEmpty()) {
+      onResult(
+        TapPaySdkCommonResult(
+          false,
+          "Missing required parameters \"priceTotal\" or \"currencyCode\" for \"requestGooglePay\" method."
+        ).toHashMap()
+      )
+      return
+    }
+
+    if (googlePayHandler.isAvailable()) {
+
+      val callback = object : GooglePayHandler.Companion.GooglePayPaymentCallback {
+        override fun onGooglePayResult(result: GooglePayHandler.Companion.GooglePayPaymentResult) {
+          onResult(
+            result.toHashMap()
+          )
+        }
+      }
+
+      googlePayHandler.requestPayment(price, currencyCode, callback)
+    } else {
+      onResult(
+        TapPaySdkCommonResult(
+          false,
+          "Google Pay is not available."
+        ).toHashMap()
+      )
+    }
+
   }
 }

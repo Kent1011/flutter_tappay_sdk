@@ -1,8 +1,11 @@
+import 'package:flutter_tappay_sdk/tappay/card_type.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_tappay_sdk_method_channel.dart';
-import 'models/initialization_tappay_result.dart';
+import 'models/tappay_init_result.dart';
 import 'models/tappay_prime.dart';
+import 'models/tappay_sdk_common_result.dart';
+import 'tappay/auth_methods.dart';
 
 /// The interface that implementations of flutter_tappay_sdk must implement.
 abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
@@ -35,12 +38,12 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
   /// [appKey] is the App Key assigned by TapPay
   /// [isSandbox] is a boolean value to indicate whether to use sandbox mode
   ///
-  /// return [InitializationTapPayResult] with value [success] as [true] if success
-  /// return [InitializationTapPayResult] with value [success] as [false] if fail
-  /// return [InitializationTapPayResult] with value [message] as [String] if fail
+  /// return [TapPayInitResult] with value [success] as [true] if success
+  /// return [TapPayInitResult] with value [success] as [false] if fail
+  /// return [TapPayInitResult] with value [message] as [String] if fail
   /// return [null] if the initialization is incomplete
   ///
-  Future<InitializationTapPayResult?> initTapPay({
+  Future<TapPayInitResult?> initTapPay({
     required int appId,
     required String appKey,
     bool isSandbox = false,
@@ -55,9 +58,8 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
   ///
   /// return [bool] with value [true] if the card is valid
   /// return [bool] with value [false] if the card is invalid
-  /// return [null] if the card information is incomplete
   ///
-  Future<bool?> isCardValid({
+  Future<bool> isCardValid({
     required String cardNumber,
     required String dueMonth,
     required String dueYear,
@@ -83,5 +85,33 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
     required String dueMonth,
     required String dueYear,
     required String cvv,
+  });
+
+  /// Initialize Google Pay
+  ///
+  /// [merchantName] is the name of the merchant. (e.g., "Google Pay Merchant")
+  /// [allowedAuthMethods] is the list of allowed authentication methods. Default value is [TapPayCardAuthMethod.panOnly] and [TapPayCardAuthMethod.cryptogram3DS]
+  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb], [TapPayCardType.unionPay]
+  /// [isPhoneNumberRequired] is a boolean value to indicate whether to require phone number. Default value is [false]
+  /// [isEmailRequired] is a boolean value to indicate whether to require email. Default value is [false]
+  /// [isBillingAddressRequired] is a boolean value to indicate whether to require billing address. Default value is [false]
+  ///
+  /// return [GooglePayInitResult] with value [success] as [true] if success.
+  /// return [GooglePayInitResult] with value [success] as [false] if fail.
+  /// return [GooglePayInitResult] with value [message] as [String] if fail.
+  /// return [null] if the initialization is incomplete
+  ///
+  Future<TapPaySdkCommonResult?> initGooglePay({
+    required String merchantName,
+    List<TapPayCardAuthMethod>? allowedAuthMethods,
+    List<TapPayCardType>? allowedCardTypes,
+    bool? isPhoneNumberRequired = false,
+    bool? isEmailRequired = false,
+    bool? isBillingAddressRequired = false,
+  });
+
+  Future<TapPayPrime?> requestGooglePay({
+    required double price,
+    required String currencyCode,
   });
 }

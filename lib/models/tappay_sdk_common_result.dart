@@ -1,27 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-/// Model for the result of initializing TapPay SDK
-///
-class InitializationTapPayResult {
-  InitializationTapPayResult({
+class TapPaySdkCommonResult {
+  TapPaySdkCommonResult({
     required this.success,
     this.message,
   });
 
-  /// The result of initializing TapPay SDK
-  ///
   final bool success;
-
-  /// The failure message of initializing TapPay SDK
-  ///
   final String? message;
 
-  InitializationTapPayResult copyWith({
+  TapPaySdkCommonResult copyWith({
     bool? success,
     String? message,
   }) {
-    return InitializationTapPayResult(
+    return TapPaySdkCommonResult(
       success: success ?? this.success,
       message: message ?? this.message,
     );
@@ -34,8 +27,8 @@ class InitializationTapPayResult {
     };
   }
 
-  factory InitializationTapPayResult.fromMap(Map<String, dynamic> map) {
-    return InitializationTapPayResult(
+  factory TapPaySdkCommonResult.fromMap(Map<String, dynamic> map) {
+    return TapPaySdkCommonResult(
       success: map['success'] as bool,
       message: map['message'] != null ? map['message'] as String : null,
     );
@@ -43,16 +36,16 @@ class InitializationTapPayResult {
 
   String toJson() => json.encode(toMap());
 
-  factory InitializationTapPayResult.fromJson(String source) =>
-      InitializationTapPayResult.fromMap(
+  factory TapPaySdkCommonResult.fromJson(String source) =>
+      TapPaySdkCommonResult.fromMap(
           json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() =>
-      'InitializationTapPayResult(success: $success, message: $message)';
+      'TapPaySdkCommonResult(success: $success, message: $message)';
 
   @override
-  bool operator ==(covariant InitializationTapPayResult other) {
+  bool operator ==(covariant TapPaySdkCommonResult other) {
     if (identical(this, other)) return true;
 
     return other.success == success && other.message == message;
