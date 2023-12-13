@@ -99,6 +99,12 @@ class MethodChannelFlutterTapPaySdk extends FlutterTapPaySdkPlatform {
     bool? isEmailRequired = false,
     bool? isBillingAddressRequired = false,
   }) async {
+    if (Platform.isAndroid == false) {
+      return TapPaySdkCommonResult(
+          success: false,
+          message: "Google Pay is only available on Android devices.");
+    }
+
     final result = await methodChannel
         .invokeMethod<Map<Object?, Object?>>('initGooglePay', {
       'merchantName': merchantName,
