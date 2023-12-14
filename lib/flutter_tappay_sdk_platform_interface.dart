@@ -6,6 +6,7 @@ import 'models/tappay_init_result.dart';
 import 'models/tappay_prime.dart';
 import 'models/tappay_sdk_common_result.dart';
 import 'tappay/auth_methods.dart';
+import 'tappay/cart_item.dart';
 
 /// The interface that implementations of flutter_tappay_sdk must implement.
 abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
@@ -114,4 +115,22 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
     required double price,
     required String currencyCode,
   });
+
+  Future<TapPaySdkCommonResult?> initApplePay({
+    required String merchantId,
+    required String merchantName,
+    List<TapPayCardType>? allowedCardTypes,
+    bool? isConsumerNameRequired = false,
+    bool? isPhoneNumberRequired = false,
+    bool? isEmailRequired = false,
+    bool? isBillingAddressRequired = false,
+  });
+
+  Future<TapPayPrime?> requestApplePay({
+    required List<CartItem> cartItems,
+    required String currencyCode,
+    required String countryCode,
+  });
+
+  Future<TapPaySdkCommonResult?> applePayResult({required bool result});
 }

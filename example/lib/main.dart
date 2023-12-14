@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_tappay_sdk/flutter_tappay_sdk.dart';
+import 'package:flutter_tappay_sdk/tappay/cart_item.dart';
 
 import 'constants.dart';
 
@@ -103,6 +104,36 @@ class _MyAppState extends State<MyApp> {
                       var payResult =
                           await _tapPaySdk.requestGooglePay(price: 2);
                       log('payResult: ${payResult?.toJson()}');
+                    }
+                  } on PlatformException {
+                    log('PlatformException');
+                  }
+                },
+              ),
+
+            if (_isTapPayReady)
+              ListTile(
+                title: const Text('Start Apple Pay'),
+                onTap: () async {
+                  try {
+                    final isApplePayReady = await _tapPaySdk.initApplePay(
+                        merchantId: kTapPayApplePayMerchantId,
+                        merchantName: 'Flutter Cafe');
+                    log('isApplePayReady: ${isApplePayReady?.toJson()}');
+
+                    if (isApplePayReady?.success == true) {
+                      var payResult =
+                          await _tapPaySdk.requestApplePay(cartItems: [
+                        CartItem(name: "Cupcake", price: 2),
+                        CartItem(name: "Donut", price: 3),
+                      ], currencyCode: 'TWD', countryCode: 'TW');
+                      log('payResult: ${payResult?.toJson()}');
+
+                      if (payResult?.success == true) {
+                        var reportResult =
+                            await _tapPaySdk.applePayResult(result: true);
+                        log('reportResult: ${reportResult?.toJson()}');
+                      }
                     }
                   } on PlatformException {
                     log('PlatformException');

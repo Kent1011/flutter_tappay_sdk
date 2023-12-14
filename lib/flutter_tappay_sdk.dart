@@ -5,6 +5,7 @@ import 'models/tappay_init_result.dart';
 import 'models/tappay_sdk_common_result.dart';
 import 'tappay/auth_methods.dart';
 import 'tappay/card_type.dart';
+import 'tappay/cart_item.dart';
 
 class FlutterTapPaySdk {
   /// To get the native SDK version
@@ -129,10 +130,46 @@ class FlutterTapPaySdk {
   Future<TapPayPrime?> requestGooglePay({
     required double price,
     String currencyCode = 'TWD',
-  }) async {
+  }) {
     return FlutterTapPaySdkPlatform.instance.requestGooglePay(
       price: price,
       currencyCode: currencyCode,
     );
+  }
+
+  Future<TapPaySdkCommonResult?> initApplePay({
+    required String merchantId,
+    required String merchantName,
+    List<TapPayCardType>? allowedCardTypes = kDefaultTapPayAllowedCardTypes,
+    bool? isConsumerNameRequired = false,
+    bool? isPhoneNumberRequired = false,
+    bool? isEmailRequired = false,
+    bool? isBillingAddressRequired = false,
+  }) {
+    return FlutterTapPaySdkPlatform.instance.initApplePay(
+      merchantId: merchantId,
+      merchantName: merchantName,
+      allowedCardTypes: allowedCardTypes,
+      isConsumerNameRequired: isConsumerNameRequired,
+      isPhoneNumberRequired: isPhoneNumberRequired,
+      isEmailRequired: isEmailRequired,
+      isBillingAddressRequired: isBillingAddressRequired,
+    );
+  }
+
+  Future<TapPayPrime?> requestApplePay({
+    required List<CartItem> cartItems,
+    required String currencyCode,
+    required String countryCode,
+  }) {
+    return FlutterTapPaySdkPlatform.instance.requestApplePay(
+      cartItems: cartItems,
+      currencyCode: currencyCode,
+      countryCode: countryCode,
+    );
+  }
+
+  Future<TapPaySdkCommonResult?> applePayResult({required bool result}) {
+    return FlutterTapPaySdkPlatform.instance.applePayResult(result: result);
   }
 }

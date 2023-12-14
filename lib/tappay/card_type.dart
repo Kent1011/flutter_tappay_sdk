@@ -28,5 +28,4 @@ const kDefaultTapPayAllowedCardTypes = [
   TapPayCardType.masterCard,
   TapPayCardType.jcb,
   TapPayCardType.americanExpress,
-  TapPayCardType.unionPay
 ];

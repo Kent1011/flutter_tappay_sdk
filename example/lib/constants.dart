@@ -1,5 +1,6 @@
 const int kTapPayAppId = 0;
 const String kTapPayAppKey = 'app_replace_this_with_your_app_key';
+const String kTapPayApplePayMerchantId = 'merchant.replace.to.your.id';
 
 const String kDefaultTestingCardNumber = '4242424242424242';
 const String kDefaultTestingDueMonth = '04';
