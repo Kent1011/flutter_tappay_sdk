@@ -122,11 +122,12 @@ class _MyAppState extends State<MyApp> {
                     log('isApplePayReady: ${isApplePayReady?.toJson()}');
 
                     if (isApplePayReady?.success == true) {
-                      var payResult =
-                          await _tapPaySdk.requestApplePay(cartItems: [
-                        CartItem(name: "Cupcake", price: 2),
-                        CartItem(name: "Donut", price: 3),
-                      ], currencyCode: 'TWD', countryCode: 'TW');
+                      var payResult = await _tapPaySdk.requestApplePay(
+                        cartItems: [
+                          CartItem(name: "Cupcake", price: 2),
+                          CartItem(name: "Donut", price: 3),
+                        ],
+                      );
                       log('payResult: ${payResult?.toJson()}');
 
                       if (payResult?.success == true) {
