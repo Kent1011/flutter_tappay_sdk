@@ -99,7 +99,7 @@ class FlutterTapPaySdk {
   ///
   /// [merchantName] is the name of the merchant. (e.g., "Google Pay Merchant")
   /// [allowedAuthMethods] is the list of allowed authentication methods. Default value is [TapPayCardAuthMethod.panOnly] and [TapPayCardAuthMethod.cryptogram3DS]
-  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb], [TapPayCardType.unionPay]
+  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb]
   /// [isPhoneNumberRequired] is a boolean value to indicate whether to require phone number. Default value is [false]
   /// [isEmailRequired] is a boolean value to indicate whether to require email. Default value is [false]
   /// [isBillingAddressRequired] is a boolean value to indicate whether to require billing address. Default value is [false]
@@ -127,6 +127,18 @@ class FlutterTapPaySdk {
         isBillingAddressRequired: isBillingAddressRequired);
   }
 
+  /// Request Google Pay
+  ///
+  /// [price] is the price of the transaction
+  /// [currencyCode] is the currency code of the transaction. Default value is 'TWD'
+  ///
+  /// return [TapPayPrime] with value [success] as [true] if success.
+  /// return [TapPayPrime] with value [success] as [false] if fail.
+  /// return [TapPayPrime] with value [status] as [int] if fail. (The value of [status] is defined by TapPay.)
+  /// return [TapPayPrime] with value [message] as [String] if fail.
+  /// return [TapPayPrime] with value [prime] as [String] if success.
+  /// return [null] if the card information is incomplete
+  ///
   Future<TapPayPrime?> requestGooglePay({
     required double price,
     String currencyCode = 'TWD',
@@ -137,6 +149,21 @@ class FlutterTapPaySdk {
     );
   }
 
+  /// Initialize Apple Pay
+  ///
+  /// [merchantId] is Apple Pay's merchant ID
+  /// [merchantName] is the name of the merchant. (e.g., "Apple Pay Merchant")
+  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb]
+  /// [isConsumerNameRequired] is a boolean value to indicate whether to require consumer name. Default value is [false]
+  /// [isPhoneNumberRequired] is a boolean value to indicate whether to require phone number. Default value is [false]
+  /// [isEmailRequired] is a boolean value to indicate whether to require email. Default value is [false]
+  /// [isBillingAddressRequired] is a boolean value to indicate whether to require billing address. Default value is [false]
+  ///
+  /// return [ApplePayInitResult] with value [success] as [true] if success.
+  /// return [ApplePayInitResult] with value [success] as [false] if fail.
+  /// return [ApplePayInitResult] with value [message] as [String] if fail.
+  /// return [null] if the initialization is incomplete
+  ///
   Future<TapPaySdkCommonResult?> initApplePay({
     required String merchantId,
     required String merchantName,
@@ -157,10 +184,23 @@ class FlutterTapPaySdk {
     );
   }
 
+  /// Request Apple Pay
+  ///
+  /// [cartItems] is the list of payment items
+  /// [currencyCode] is the currency code of the transaction. Default value is 'TWD'
+  /// [countryCode] is the country code of the transaction. Default value is 'TW'
+  ///
+  /// return [TapPayPrime] with value [success] as [true] if success.
+  /// return [TapPayPrime] with value [success] as [false] if fail.
+  /// return [TapPayPrime] with value [status] as [int] if fail. (The value of [status] is defined by TapPay.)
+  /// return [TapPayPrime] with value [message] as [String] if fail.
+  /// return [TapPayPrime] with value [prime] as [String] if success.
+  /// return [null] if the card information is incomplete
+  ///
   Future<TapPayPrime?> requestApplePay({
     required List<CartItem> cartItems,
-    required String currencyCode,
-    required String countryCode,
+    String currencyCode = 'TWD',
+    String countryCode = 'TW',
   }) {
     return FlutterTapPaySdkPlatform.instance.requestApplePay(
       cartItems: cartItems,
@@ -169,6 +209,16 @@ class FlutterTapPaySdk {
     );
   }
 
+  /// Report Apple Pay result
+  ///
+  /// When you send the prime to your server and get the result, you can report the result to TapPay.
+  ///
+  /// [result] is the result of the transaction.
+  ///
+  /// return [TapPaySdkCommonResult] with value [success] as [true] if success.
+  /// return [TapPaySdkCommonResult] with value [success] as [false] if fail.
+  /// return [TapPaySdkCommonResult] with value [message] as [String] if fail.
+  ///
   Future<TapPaySdkCommonResult?> applePayResult({required bool result}) {
     return FlutterTapPaySdkPlatform.instance.applePayResult(result: result);
   }

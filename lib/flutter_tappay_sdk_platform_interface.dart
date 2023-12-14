@@ -92,7 +92,7 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
   ///
   /// [merchantName] is the name of the merchant. (e.g., "Google Pay Merchant")
   /// [allowedAuthMethods] is the list of allowed authentication methods. Default value is [TapPayCardAuthMethod.panOnly] and [TapPayCardAuthMethod.cryptogram3DS]
-  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb], [TapPayCardType.unionPay]
+  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb]
   /// [isPhoneNumberRequired] is a boolean value to indicate whether to require phone number. Default value is [false]
   /// [isEmailRequired] is a boolean value to indicate whether to require email. Default value is [false]
   /// [isBillingAddressRequired] is a boolean value to indicate whether to require billing address. Default value is [false]
@@ -111,11 +111,37 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
     bool? isBillingAddressRequired = false,
   });
 
+  /// Request Google Pay
+  ///
+  /// [price] is the price of the transaction
+  /// [currencyCode] is the currency code of the transaction
+  ///
+  /// return [GooglePayResult] with value [success] as [true] if success.
+  /// return [GooglePayResult] with value [success] as [false] if fail.
+  /// return [GooglePayResult] with value [message] as [String] if fail.
+  /// return [GooglePayResult] with value [prime] as [String] if success.
+  /// return [null] if the request is incomplete
+  ///
   Future<TapPayPrime?> requestGooglePay({
     required double price,
     required String currencyCode,
   });
 
+  /// Initialize Apple Pay
+  ///
+  /// [merchantId] is Apple Pay's merchant ID
+  /// [merchantName] is the name of the merchant. (e.g., "Apple Pay Merchant")
+  /// [allowedCardTypes] is the list of allowed card networks. Default value is [TapPayCardType.visa], [TapPayCardType.masterCard], [TapPayCardType.americanExpress], [TapPayCardType.jcb]
+  /// [isConsumerNameRequired] is a boolean value to indicate whether to require consumer name. Default value is [false]
+  /// [isPhoneNumberRequired] is a boolean value to indicate whether to require phone number. Default value is [false]
+  /// [isEmailRequired] is a boolean value to indicate whether to require email. Default value is [false]
+  /// [isBillingAddressRequired] is a boolean value to indicate whether to require billing address. Default value is [false]
+  ///
+  /// return [ApplePayInitResult] with value [success] as [true] if success.
+  /// return [ApplePayInitResult] with value [success] as [false] if fail.
+  /// return [ApplePayInitResult] with value [message] as [String] if fail.
+  /// return [null] if the initialization is incomplete
+  ///
   Future<TapPaySdkCommonResult?> initApplePay({
     required String merchantId,
     required String merchantName,
@@ -126,11 +152,33 @@ abstract class FlutterTapPaySdkPlatform extends PlatformInterface {
     bool? isBillingAddressRequired = false,
   });
 
+  /// Request Apple Pay
+  ///
+  /// [cartItems] is the list of items in the cart
+  /// [currencyCode] is the currency code of the transaction
+  /// [countryCode] is the country code of the transaction
+  ///
+  /// return [ApplePayResult] with value [success] as [true] if success.
+  /// return [ApplePayResult] with value [success] as [false] if fail.
+  /// return [ApplePayResult] with value [message] as [String] if fail.
+  /// return [ApplePayResult] with value [prime] as [String] if success.
+  /// return [null] if the request is incomplete
+  ///
   Future<TapPayPrime?> requestApplePay({
     required List<CartItem> cartItems,
     required String currencyCode,
     required String countryCode,
   });
 
+  /// Report Apple Pay result
+  ///
+  /// When you send the prime to your server and get the result, you can report the result to TapPay.
+  ///
+  /// [result] is the result of the transaction.
+  ///
+  /// return [TapPaySdkCommonResult] with value [success] as [true] if success.
+  /// return [TapPaySdkCommonResult] with value [success] as [false] if fail.
+  /// return [TapPaySdkCommonResult] with value [message] as [String] if fail.
+  ///
   Future<TapPaySdkCommonResult?> applePayResult({required bool result});
 }

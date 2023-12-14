@@ -1,3 +1,9 @@
+## 0.1.0
+
+- Add support for Apple Pay.
+- Add support for Google Pay.
+- Add support for DirectPay.
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Initial release.
