@@ -1,8 +1,8 @@
 # Flutter TapPay SDK
 
-This project is a Flutter SDK for TapPay, a popular payment gateway from Taiwan.
+This project is a Flutter SDK for [TapPay](https://www.tappaysdk.com/), a popular payment gateway from Taiwan.
 
-Warning: This is not an official SDK maintained by TapPay. Since TapPay does not provide an official SDK for Flutter, this project is created to wrap TapPay's official SDK.
+**Warning:** This is not an official SDK maintained by TapPay. Since TapPay does not provide an official SDK for Flutter, this project is created to wrap TapPay's official SDK.
 
 ## Features
 
@@ -50,7 +50,7 @@ Add the following to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_tappay_sdk: ^0.1.1
+  flutter_tappay_sdk: ^0.2.0
 ```
 
 ## Usage
