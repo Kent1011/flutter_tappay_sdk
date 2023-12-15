@@ -4,7 +4,7 @@ version: 0.1.1
 homepage: https://github.com/Kent1011/flutter_tappay_sdk
 
 environment:
-  sdk: '>=3.2.1 <4.0.0'
+  sdk: '>=2.17.0 <4.0.0'
   flutter: '>=3.3.0'
 
 dependencies:
