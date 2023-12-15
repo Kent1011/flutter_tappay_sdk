@@ -1,3 +1,7 @@
+## 0.3.0
+
+- fix: Resolve compilation issues by adding TPDirect.xcframework and TPDirectResource to flutter_tappay_sdk.podspec
+
 ## 0.2.0
 
 - feat: Support downgraded to Dart 2.17.0
