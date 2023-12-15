@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_tappay_sdk'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin project.'
+  s.version          = '0.3.0'
+  s.summary          = 'A Flutter plugin for TapPay SDK.'
   s.description      = <<-DESC
-A new Flutter plugin project.
+A Flutter plugin for TapPay SDK.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/Kent1011/flutter_tappay_sdk'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Kent Chien' => 'kent1011@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
