@@ -1,3 +1,7 @@
+## 0.2.0
+
+- feat: Support downgraded to Dart 2.17.0
+
 ## 0.1.1
 
 - fix: Fix iOS `CartItem.price` type. (from `int` to `double`)
