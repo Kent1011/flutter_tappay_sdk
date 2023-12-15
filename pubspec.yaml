@@ -1,6 +1,6 @@
 name: flutter_tappay_sdk
 description: 'This project is a Flutter SDK for TapPay, a popular payment gateway from Taiwan.'
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/Kent1011/flutter_tappay_sdk
 
 environment:
