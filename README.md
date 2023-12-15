@@ -50,7 +50,7 @@ Add the following to your `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_tappay_sdk: ^0.2.0
+  flutter_tappay_sdk: ^0.3.0
 ```
 
 ## Usage
